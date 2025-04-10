@@ -65,3 +65,17 @@ interface InputProps extends React.ComponentProps<"input"> {
 export const Input = ({ className, children, ...props }: InputProps) => {
   return <input className={cn("block outline-none", className)} {...props} />;
 };
+interface TextAreaProps extends React.ComponentProps<"textarea"> {
+  className?: string;
+  children?: React.ReactNode;
+}
+export const TextArea = ({ className, children, ...props }: TextAreaProps) => {
+  return (
+    <textarea
+      className={cn("outline-none p-2 rounded-xl mb-2", className)}
+      {...props}
+    >
+      {children}
+    </textarea>
+  );
+};
