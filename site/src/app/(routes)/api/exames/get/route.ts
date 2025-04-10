@@ -1,6 +1,6 @@
 interface ResponseType {
   content: string;
-  type: "text" | "img";
+  type: "paragraph" | "image";
 }
 [];
 export const POST = async (req: Request) => {
@@ -13,11 +13,11 @@ export const POST = async (req: Request) => {
       aliquet ac. Mauris hendrerit nibh et odio vestibulum ultrices. Sed pretium mi vel venenatis tristique. Proin
       tellus justo, molestie id nunc vel, scelerisque hendrerit tellus. Nullam condimentum mauris lectus, et consequat
       metus pulvinar vitae. Pellentesque mi purus, tempus sed quam vel, tristique semper leo.`,
-      type: "text",
+      type: "paragraph",
     },
     {
       content: `https://cdn.pixabay.com/photo/2015/04/23/22/00/new-year-background-736885_1280.jpg`,
-      type: "img",
+      type: "image",
     },
   ];
   // if (data.status !== 200) {

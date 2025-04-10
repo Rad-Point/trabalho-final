@@ -17,8 +17,8 @@ const BuscarExame = ({ getExame }: BuscarExameProps) => {
       onSubmit={getExame}
     >
       <InputContainer className="w-full rounded-2xl">
-        <InputGroup className="w-full bg-accent border border-border rounded-2xl p-2">
-          <InputField className="border border-muted rounded-t-2xl">
+        <InputGroup className="w-full bg-accent">
+          <InputField className="rounded-t-2xl">
             <Label className="w-full h-6 text-center">Número do Exame</Label>
             <Input
               className="w-full h-8 text-center"
@@ -26,7 +26,7 @@ const BuscarExame = ({ getExame }: BuscarExameProps) => {
               type="number"
             />
           </InputField>
-          <InputField className="border border-t-0 border-muted rounded-b-2xl">
+          <InputField className="border-t-0 rounded-b-2xl">
             <Label className="w-full h-6 text-center">Senha</Label>
             <Input
               className="w-full h-8 text-center"
@@ -36,11 +36,8 @@ const BuscarExame = ({ getExame }: BuscarExameProps) => {
           </InputField>
         </InputGroup>
       </InputContainer>
-      <Button
-        className="rounded-lg border border-border bg-accent text-foreground hover:bg-muted cursor-pointer"
-        asChild
-      >
-        <button>Procurar</button>
+      <Button className="rounded-lg border border-border bg-accent text-foreground hover:bg-muted cursor-pointer">
+        Procurar
       </Button>
     </form>
   );

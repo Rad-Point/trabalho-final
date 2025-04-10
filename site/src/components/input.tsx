@@ -1,5 +1,5 @@
 import React from "react";
-
+import { cn } from "@/lib/utils";
 interface InputContainerProps extends React.ComponentProps<"div"> {
   className?: string;
   children: React.ReactNode;
@@ -10,7 +10,7 @@ export const InputContainer = ({
   ...props
 }: InputContainerProps) => {
   return (
-    <div className={`${className ?? ""} `} {...props}>
+    <div className={cn("", className)} {...props}>
       {children}
     </div>
   );
@@ -25,7 +25,10 @@ export const InputGroup = ({
   ...props
 }: InputGroupProps) => {
   return (
-    <div className={`${className ?? ""} `} {...props}>
+    <div
+      className={cn("border border-border rounded-2xl p-2", className)}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -40,7 +43,7 @@ export const InputField = ({
   ...props
 }: InputFieldProps) => {
   return (
-    <div className={`${className ?? ""} `} {...props}>
+    <div className={cn("border border-muted", className)} {...props}>
       {children}
     </div>
   );
@@ -51,7 +54,7 @@ interface LabelProps extends React.ComponentProps<"label"> {
 }
 export const Label = ({ className, children, ...props }: LabelProps) => {
   return (
-    <label className={`${className ?? ""} block`} {...props}>
+    <label className={cn("block", className)} {...props}>
       {children}
     </label>
   );
@@ -60,7 +63,5 @@ interface InputProps extends React.ComponentProps<"input"> {
   className?: string;
 }
 export const Input = ({ className, children, ...props }: InputProps) => {
-  return (
-    <input className={`${className ?? ""} block outline-none`} {...props} />
-  );
+  return <input className={cn("block outline-none", className)} {...props} />;
 };
