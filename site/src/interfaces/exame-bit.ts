@@ -1,7 +1,5 @@
-export type ExameTypes = "paragraph" | "image";
-export const exameTypes: ExameTypes[] = ["paragraph", "image"];
-export interface ExameBit {
-  content: string;
-  type: ExameTypes;
-  uploaded?: boolean;
-}
+export type ExameBit =
+  | { type: "paragraph"; content: string }
+  | { type: "image"; content: string; uploaded: boolean };
+
+export const exameTypes = ["paragraph", "image"] as const;
