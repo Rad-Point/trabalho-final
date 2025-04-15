@@ -67,15 +67,14 @@ export const Input = ({ className, children, ...props }: InputProps) => {
 };
 interface TextAreaProps extends React.ComponentProps<"textarea"> {
   className?: string;
-  children?: React.ReactNode;
+  value?: string;
 }
-export const TextArea = ({ className, children, ...props }: TextAreaProps) => {
+export const TextArea = ({ className, value, ...props }: TextAreaProps) => {
   return (
     <textarea
       className={cn("outline-none p-2 rounded-xl mb-2", className)}
+      value={value}
       {...props}
-    >
-      {children}
-    </textarea>
+    ></textarea>
   );
 };

@@ -1,5 +1,5 @@
 "use client";
-import { Input, TextArea } from "@/components/input";
+import { TextArea } from "@/components/input";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,11 +13,23 @@ import { ExameBit, exameTypes } from "@/interfaces/exame-bit";
 import Image from "next/image";
 import { useState } from "react";
 const CriarExame = () => {
+  const gerar = async () => {
+    try {
+      const q = await fetch("/api/exames/set", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      const res = await q.json();
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const type = exameTypes;
   const [data, setData] = useState<ExameBit[]>([
     { type: "paragraph", content: "" },
   ]);
-  const uploadImage = (e: any, i: number) => {
+  const uploadImage = (e: React.MouseEvent<HTMLButtonElement>, i: number) => {
     e.preventDefault();
     const input = document.createElement("input");
     input.type = "file";
@@ -45,39 +57,43 @@ const CriarExame = () => {
         switch (d.type) {
           case "paragraph":
             return (
-              <TextArea
-                key={i}
-                className="w-full h-80 border border-border"
-                children={d.content}
-                onChange={(e) => {
-                  const newData = d;
-                  newData.content = e.target.value;
-                  setData((prevState) => [
-                    ...prevState.slice(0, i),
-                    newData,
-                    ...prevState.slice(i + 1),
-                  ]);
-                }}
-              />
+              <div className="w-full relative px-4" key={i}>
+                <TextArea
+                  key={i}
+                  className="w-full h-80 border border-border resize-none"
+                  value={d.content}
+                  onChange={(e) => {
+                    const newData = d;
+                    newData.content = e.target.value;
+                    setData((prevState) => [
+                      ...prevState.slice(0, i),
+                      newData,
+                      ...prevState.slice(i + 1),
+                    ]);
+                  }}
+                />
+                {i > 0 && (
+                  <Button
+                    className="absolute top-4 right-4"
+                    variant={"destructive"}
+                    onClick={() => {
+                      setData((prevState) => [
+                        ...prevState.slice(0, i),
+                        ...prevState.slice(i + 1),
+                      ]);
+                    }}
+                  >
+                    X
+                  </Button>
+                )}
+              </div>
             );
           case "image":
             return (
               <div
-                className="relative p-4 flex justify-center items-center w-1/3 aspect-square bg-accent rounded-2xl"
+                className="relative overflow-hidden flex justify-center items-center w-1/3 aspect-square bg-accent rounded-2xl"
                 key={i}
               >
-                <Button
-                  className="absolute top-4 right-4"
-                  variant={"destructive"}
-                  onClick={() => {
-                    setData((prevState) => [
-                      ...prevState.slice(0, i),
-                      ...prevState.slice(i + 1),
-                    ]);
-                  }}
-                >
-                  X
-                </Button>
                 {d.uploaded ? (
                   <>
                     <Image
@@ -95,6 +111,20 @@ const CriarExame = () => {
                     }}
                   >
                     Selecionar arquivos
+                  </Button>
+                )}
+                {i > 0 && (
+                  <Button
+                    className="absolute top-4 right-4"
+                    variant={"destructive"}
+                    onClick={() => {
+                      setData((prevState) => [
+                        ...prevState.slice(0, i),
+                        ...prevState.slice(i + 1),
+                      ]);
+                    }}
+                  >
+                    X
                   </Button>
                 )}
               </div>
@@ -132,6 +162,14 @@ const CriarExame = () => {
           </DialogHeader>
         </DialogContent>
       </Dialog>
+      <Button
+        className="mt-8"
+        onClick={() => {
+          gerar();
+        }}
+      >
+        Gerar arquivo
+      </Button>
     </main>
   );
 };
