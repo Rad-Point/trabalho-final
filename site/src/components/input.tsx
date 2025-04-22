@@ -62,7 +62,7 @@ export const Label = ({ className, children, ...props }: LabelProps) => {
 interface InputProps extends React.ComponentProps<"input"> {
   className?: string;
 }
-export const Input = ({ className, children, ...props }: InputProps) => {
+export const Input = ({ className, ...props }: InputProps) => {
   return <input className={cn("block outline-none", className)} {...props} />;
 };
 interface TextAreaProps extends React.ComponentProps<"textarea"> {
