@@ -7,7 +7,7 @@ export const POST = async (req: Request) => {
     const exame = ID.gerarNumero();
     const senha = `R-${ID.gerarNumero(8)}`;
     const fileName = `exame-${exame}.json`;
-    const dir = path.resolve(process.cwd(), "exames");
+    const dir = path.resolve(process.cwd(), "laudos");
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }

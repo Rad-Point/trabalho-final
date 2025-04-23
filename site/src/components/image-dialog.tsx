@@ -67,7 +67,7 @@ const ImageDialog = ({ files, previewUrls }: ImageDialogProps) => {
   };
   const content = (img?: number) => {
     return (
-      <div className="w-full max-w-[1100px] aspect-square flex flex-col items-center relative">
+      <div className="w-full max-w-[1100px] h-full flex flex-col items-center relative">
         {files.length < 4 ? (
           <Image
             src={previewUrls[img ?? 0]}

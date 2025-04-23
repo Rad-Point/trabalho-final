@@ -1,3 +1,5 @@
+import formatCPF from "./format-CPF";
+
 const enviarLaudo = async (data: HTMLElement) => {
   const innerHTML = data.innerHTML;
   const response = await fetch("/api/laudos/set", {
@@ -7,29 +9,51 @@ const enviarLaudo = async (data: HTMLElement) => {
     },
     body: new Blob([innerHTML], { type: "text/html" }),
   });
-  if (response.status === 200) {
-    const res = await response.json();
-    console.log(res);
-  } else {
-    console.error("Failed to send laudo. Status:", response.status);
-  }
+  const res = await response.json();
+  return res;
 };
-const gerarLaudo = (
-  win: Window,
-  { name, CPF, text }: { name: string; CPF: number; text: string }
-) => {
+const gerarLaudo = ({
+  name,
+  CPF,
+  text,
+  type,
+}: {
+  name: string;
+  CPF: number;
+  text: string;
+  type: string;
+}) => {
+  const win = window.open("", "", "height=1123,width=794");
+  if (!win) return;
   const laudoContent = `
     <html>
-      <head><title>Laudo Médico - ${name}</title></head>
-      <body>
-        <p style="font-size:18px; padding: 2rem;">Atesto que o senhor(a) ${name}, Inscrito no CPF ${CPF}, apresenta o seguinte quadro:</p>
+      <head>
+        <title>Laudo Médico - ${name}</title>
+      </head>
+      <body style="">
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: sans-serif;
+          }
+          body {
+            padding: 1rem;
+          }
+        </style>
+        <p>Atesto que o(a) senhor(a) ${name}, Inscrito no CPF ${formatCPF(
+    CPF
+  )}, apresenta o seguinte quadro:</p>
         <p>${text}</p>
       </body>
     </html>
   `;
   win.document.write(laudoContent);
   enviarLaudo(win.document.body);
-  win.print();
+  if (type === "save and print") {
+    win.print();
+  }
   win.close();
 };
 export default gerarLaudo;
