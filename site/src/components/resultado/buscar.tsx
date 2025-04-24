@@ -1,3 +1,4 @@
+import { FormEvent } from "react";
 import {
   InputContainer,
   InputField,
@@ -6,7 +7,6 @@ import {
   Input,
 } from "@/components/input";
 import { Button } from "@/components/ui/button";
-import { FormEvent } from "react";
 interface BuscarExameProps {
   getExame: (e: FormEvent<HTMLFormElement>) => Promise<void>;
 }
@@ -22,7 +22,7 @@ const BuscarExame = ({ getExame }: BuscarExameProps) => {
             <Label className="w-full h-6 text-center">Número do Exame</Label>
             <Input
               className="w-full h-8 text-center"
-              name="exame"
+              name="numero"
               type="number"
             />
           </InputField>

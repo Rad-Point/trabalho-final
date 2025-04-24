@@ -1,57 +1,102 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import JSZip from "jszip";
 import ImageDialog from "@/components/image-dialog";
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
+
 const CriarExamePage = () => {
   const { paciente } = useParams();
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [generating, setGenerating] = useState<boolean>(false);
+  const [examData, setExamData] = useState<{
+    exame: string;
+    senha: string;
+  } | null>(null);
   useEffect(() => {
     return () => {
       previewUrls.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [previewUrls]);
-  const attach = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (files.length === 0) {
-      alert("Please select at least one image to upload.");
-      return;
-    }
-    const zip = new JSZip();
-    files.forEach((file) => {
-      zip.file(file.name, file);
-    });
+
+  const handleFiles = (incomingFiles: File[]) => {
+    const validFiles = incomingFiles.filter((file) =>
+      file.type.startsWith("image/")
+    );
+    const urls = validFiles.map((file) => URL.createObjectURL(file));
+    setPreviewUrls(urls);
+    setFiles(validFiles);
+  };
+
+  const attach = useCallback(
+    async (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (files.length === 0) {
+        alert("Please select at least one image to upload.");
+        return;
+      }
+      setUploading(true);
+      const zip = new JSZip();
+      files.forEach((file) => {
+        zip.file(file.name, file);
+      });
+      try {
+        const blob = await zip.generateAsync({ type: "blob" });
+        console.log("Uploading blob:", { size: blob.size, type: blob.type });
+
+        const response = await fetch("/api/imagens/set", {
+          method: "POST",
+          body: blob,
+          headers: {
+            "Content-Type": "application/zip",
+          },
+        });
+
+        if (!response.ok)
+          throw new Error(`Upload failed: ${response.statusText}`);
+        const res = await response.json();
+
+        if (res.status === 200) {
+        } else {
+          console.error("Upload error:", res);
+        }
+      } catch (err) {
+        console.error("Error uploading images:", err);
+      } finally {
+        setUploading(false);
+      }
+    },
+    [files]
+  );
+  const generate = useCallback(async () => {
+    setGenerating(true);
     try {
-      const blob = await zip.generateAsync({ type: "blob" });
-      console.log(JSON.stringify(blob));
-      const q = await fetch("/api/imagens/set", {
+      const response = await fetch("/api/exames/set", {
         method: "POST",
-        body: blob,
+        body: JSON.stringify(paciente),
         headers: {
-          "Content-Type": "application/zip",
+          "Content-Type": "application/json",
         },
       });
-      const res = await q.json();
-      if (res.status === 200) {
-        const i = await fetch("/api/exames/set", {
-          method: "POST",
-          body: JSON.stringify(paciente),
-        });
-        const r = await i.json();
-        console.log(r);
-      }
+
+      if (!response.ok)
+        throw new Error(`Generation failed: ${response.statusText}`);
+      const data = await response.json();
+      setExamData(data);
     } catch (err) {
-      console.error("Error uploading images:", err);
+      console.error("Error generating:", err);
+    } finally {
+      setGenerating(false);
     }
-  };
+  }, [paciente]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const readEntriesRecursively = (entry: any, path = ""): Promise<File[]> => {
     return new Promise((resolve) => {
       if (entry.isFile) {
         entry.file((file: File) => {
-          // @ts-expect-error file.fullPath is not a standard property, but it's needed for our use case
+          // @ts-expect-error - fullPath is non-standard but useful
           file.fullPath = path + file.name;
           if (file.type.startsWith("image/")) resolve([file]);
           else resolve([]);
@@ -81,22 +126,43 @@ const CriarExamePage = () => {
       }
     });
   };
+
   return (
     <main className="w-screen h-screen p-32 flex flex-col items-center overflow-x-hidden">
       {files.length > 0 ? (
-        <div className="w-screen h-full gap-4">
+        <div className="w-screen gap-4">
           <div className="w-full max-w-64 m-auto flex flex-col items-center gap-4">
             <Button
-              onClick={() => setFiles([])}
+              onClick={() => {
+                setFiles([]);
+                previewUrls.forEach((url) => URL.revokeObjectURL(url));
+                setPreviewUrls([]);
+              }}
               className="self-end"
-              variant={"destructive"}
+              variant="destructive"
             >
               X
             </Button>
             <ImageDialog files={files} previewUrls={previewUrls} />
-            <Button className="w-full max-w-64 cursor-pointer" onClick={attach}>
-              Enviar
+            <Button
+              className="w-full max-w-64 cursor-pointer"
+              onClick={attach}
+              disabled={uploading}
+            >
+              {uploading ? "Enviando..." : "Enviar"}
             </Button>
+            <Button
+              className="w-full max-w-64 cursor-pointer"
+              onClick={generate}
+            >
+              {generating ? "Gerando..." : "Gerar Senha"}
+            </Button>
+            {examData && (
+              <div>
+                <p>Número: {examData.exame}</p>
+                <p>Senha: {examData.senha}</p>
+              </div>
+            )}
           </div>
         </div>
       ) : (
@@ -107,11 +173,11 @@ const CriarExamePage = () => {
             input.type = "file";
             input.accept = "image/*";
             input.multiple = true;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (input as any).webkitdirectory = true;
             input.onchange = (e) => {
               const files = Array.from((e.target as HTMLInputElement).files!);
-              const urls = files.map((file) => URL.createObjectURL(file));
-              setPreviewUrls(urls);
-              setFiles(files);
+              handleFiles(files);
             };
             input.click();
             input.remove();
@@ -127,9 +193,7 @@ const CriarExamePage = () => {
                 allFiles.push(...files);
               }
             }
-            const urls = allFiles.map((file) => URL.createObjectURL(file));
-            setPreviewUrls(urls);
-            setFiles(allFiles);
+            handleFiles(allFiles);
           }}
           onDragOver={(e) => e.preventDefault()}
         >

@@ -5,9 +5,9 @@ export const POST = async (req: Request) => {
   try {
     const patient = await req.json();
     const filePath = `${path.join(process.cwd())}/exames/${patient}`;
-    const [exame, senha] = [`R-${ID.gerar()}`, `R${ID.gerar()}`];
+    const [exame, senha] = [`${ID.gerarNumero(10)}`, `R${ID.gerar()}`];
     writeFileSync(`${filePath}/${exame}-${senha}.txt`, "");
-    return new Response(JSON.stringify(""), {
+    return new Response(JSON.stringify({ exame, senha }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
