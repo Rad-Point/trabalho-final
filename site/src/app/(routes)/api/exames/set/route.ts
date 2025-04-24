@@ -1,20 +1,13 @@
-import fs from "fs";
+import { writeFileSync } from "fs";
 import path from "path";
 import { ID } from "@/functions/id";
 export const POST = async (req: Request) => {
   try {
-    const data = await req.json();
-    const exame = ID.gerarNumero();
-    const senha = `R-${ID.gerarNumero(8)}`;
-    const fileName = `exame-${exame}.json`;
-    const dir = path.resolve(process.cwd(), "laudos");
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    const filePath = path.join(dir, fileName);
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
-
-    return new Response(JSON.stringify({ exame, senha }), {
+    const patient = await req.json();
+    const filePath = `${path.join(process.cwd())}/exames/${patient}`;
+    const [exame, senha] = [`R-${ID.gerar()}`, `R${ID.gerar()}`];
+    writeFileSync(`${filePath}/${exame}-${senha}.txt`, "");
+    return new Response(JSON.stringify(""), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

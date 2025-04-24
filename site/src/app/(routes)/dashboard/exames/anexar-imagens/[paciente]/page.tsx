@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import JSZip from "jszip";
 import ImageDialog from "@/components/image-dialog";
 import { Button } from "@/components/ui/button";
+import { useParams } from "next/navigation";
 const CriarExamePage = () => {
+  const { paciente } = useParams();
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   useEffect(() => {
@@ -21,7 +23,6 @@ const CriarExamePage = () => {
     files.forEach((file) => {
       zip.file(file.name, file);
     });
-    console.log(zip);
     try {
       const blob = await zip.generateAsync({ type: "blob" });
       console.log(JSON.stringify(blob));
@@ -33,7 +34,14 @@ const CriarExamePage = () => {
         },
       });
       const res = await q.json();
-      console.log(res);
+      if (res.status === 200) {
+        const i = await fetch("/api/exames/set", {
+          method: "POST",
+          body: JSON.stringify(paciente),
+        });
+        const r = await i.json();
+        console.log(r);
+      }
     } catch (err) {
       console.error("Error uploading images:", err);
     }

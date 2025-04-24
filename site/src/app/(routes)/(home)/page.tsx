@@ -1,41 +1,26 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 export default function Home() {
-  const [laudos, setLaudos] = useState<string[]>([]);
-  const test = async () => {
-    const q = await fetch("/api/laudos/get", { method: "GET" });
-    const res = await q.json();
-    setLaudos(res.length > 0 ? res : []);
-  };
-  const click = async (laudo: string) => {
-    const q = await fetch("/api/laudos/get", {
+  const click = async () => {
+    const q = await fetch("/api/exames/get", {
       method: "POST",
-      body: JSON.stringify({ name: laudo }),
+      body: JSON.stringify({ numero: "R-1777854", senha: "R7606697" }),
     });
-    const res = await q.arrayBuffer();
-    const data = new Blob([res], { type: "application/pdf" });
-    const url = URL.createObjectURL(data);
-    window.open(url);
+    const res = await q.json();
+    console.log(res);
   };
-  useEffect(() => {
-    test();
-  }, []);
+  useEffect(() => {}, []);
   return (
     <main className="w-screen h-screen flex flex-col gap-2 items-center justify-center">
-      {laudos.map((laudo, i) => {
-        return (
-          <Button
-            key={i}
-            onClick={(e) => {
-              e.preventDefault();
-              click(laudo);
-            }}
-          >
-            {laudo}
-          </Button>
-        );
-      })}
+      <Button
+        onClick={(e) => {
+          e.preventDefault();
+          click();
+        }}
+      >
+        Test
+      </Button>
     </main>
   );
 }
