@@ -19,6 +19,7 @@ const ExameBit = ({ file }: ExameBitProps) => {
         </div>
       ) : file.type === "png" ||
         file.type === "jpg" ||
+        file.type === "jfif" ||
         file.type === "webp" ||
         file.type === "jpeg" ? (
         <div className="w-64 my-2 aspect-square relative">
